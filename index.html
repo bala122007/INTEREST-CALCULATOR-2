@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>தனிவட்டி கணக்கீடு - Simple Interest Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .form-section h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-group input::placeholder {
+            color: #999;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .button-group button {
+            flex: 1;
+            padding: 18px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-calculate:active {
+            transform: translateY(0);
+        }
+
+        .btn-reset {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+
+        .btn-reset:hover {
+            background: #e0e0e0;
+            border-color: #999;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 15px;
+            border-left: 4px solid #c33;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .results-section {
+            background: #f0f7ff;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #667eea;
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .results-section h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #ddd;
+            font-size: 15px;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: #555;
+            font-weight: 500;
+        }
+
+        .result-value {
+            color: #333;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .result-item.highlight {
+            background: #e8f2ff;
+            padding: 15px;
+            margin: 0 -25px 0 -25px;
+            padding: 15px 25px;
+            border-radius: 8px;
+        }
+
+        .result-item.highlight .result-label {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .result-item.highlight .result-value {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .calculation-steps {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+        }
+
+        .calculation-steps h3 {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .step {
+            background: #fafafa;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            color: #667eea;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+                border-radius: 15px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .form-section {
+                padding: 18px;
+            }
+
+            .form-section h2 {
+                font-size: 16px;
+            }
+
+            .input-group label {
+                font-size: 15px;
+            }
+
+            .input-group input {
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            .button-group button {
+                padding: 15px;
+                font-size: 15px;
+            }
+
+            .results-section {
+                padding: 18px;
+            }
+
+            .result-item {
+                font-size: 14px;
+                padding: 10px 0;
+            }
+
+            .step {
+                font-size: 13px;
+            }
+        }
+
+        .info-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #7c2d12;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>தனிவட்டி கணக்கீடு</h1>
+            <p>உங்கள் முதலீட்டுக்கான வட்டி கணக்கிடவும்</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="form-section">
+            <h2>தகவல் உள்ளிடவும்</h2>
+
+            <div class="input-group">
+                <label for="principal">முதலீட்டுத் தொகை (₹)</label>
+                <input 
+                    type="number" 
+                    id="principal" 
+                    placeholder="உதாரணம்: 100000"
+                    min="0"
+                    step="1"
+                >
+            </div>
+
+            <div class="input-group">
+                <label for="rate">மாத வட்டி (%)</label>
+                <input 
+                    type="number" 
+                    id="rate" 
+                    placeholder="உதாரணம்: 1"
+                    min="0"
+                    step="0.01"
+                >
+            </div>
+
+            <div class="input-group">
+                <label for="years">ஆண்டுகள்</label>
+                <input 
+                    type="number" 
+                    id="years" 
+                    placeholder="0"
+                    min="0"
+                    value="0"
+                    step="1"
+                >
+            </div>
+
+            <div class="input-group">
+                <label for="months">மாதங்கள்</label>
+                <input 
+                    type="number" 
+                    id="months" 
+                    placeholder="0"
+                    min="0"
+                    max="11"
+                    value="0"
+                    step="1"
+                >
+            </div>
+
+            <div class="input-group">
+                <label for="days">நாட்கள்</label>
+                <input 
+                    type="number" 
+                    id="days" 
+                    placeholder="0"
+                    min="0"
+                    max="29"
+                    value="0"
+                    step="1"
+                >
+            </div>
+
+            <div class="button-group">
+                <button class="btn-calculate" onclick="calculateInterest()">கணக்கிடுக</button>
+                <button class="btn-reset" onclick="resetForm()">மீட்டமைக்க</button>
+            </div>
+
+            <div class="info-box">
+                <strong>குறிப்பு:</strong> முதலீட்டுத் தொகை மற்றும் மாத வட்டி இரண்டும் அவசியம்
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <h2>கணக்கீட்டு முடிவுகள்</h2>
+
+            <div class="result-item">
+                <span class="result-label">முதலீட்டுத் தொகை</span>
+                <span class="result-value" id="resultPrincipal">₹0.00</span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">மாத வட்டி</span>
+                <span class="result-value" id="resultRate">0%</span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">கால அளவு</span>
+                <span class="result-value" id="resultDuration">0 நாட்கள்</span>
+            </div>
+
+            <div class="calculation-steps" id="stepsContainer"></div>
+
+            <div class="result-item" style="margin-top: 20px;">
+                <span class="result-label">மொத்த வட்டி</span>
+                <span class="result-value" id="resultTotalInterest">₹0.00</span>
+            </div>
+
+            <div class="result-item highlight">
+                <span class="result-label">இறுதித் தொகை</span>
+                <span class="result-value" id="resultFinalAmount">₹0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatIndianCurrency(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(amount);
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+        }
+
+        function hideError() {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.classList.remove('show');
+        }
+
+        function calculateInterest() {
+            hideError();
+
+            const principal = parseFloat(document.getElementById('principal').value);
+            const rate = parseFloat(document.getElementById('rate').value);
+            const years = parseInt(document.getElementById('years').value) || 0;
+            const months = parseInt(document.getElementById('months').value) || 0;
+            const days = parseInt(document.getElementById('days').value) || 0;
+
+            // Validation
+            if (!document.getElementById('principal').value) {
+                showError('தயவுசெய்து முதலீட்டுத் தொகையை உள்ளிடவும்.');
+                return;
+            }
+
+            if (!document.getElementById('rate').value) {
+                showError('தயவுசெய்து மாத வட்டியை உள்ளிடவும்.');
+                return;
+            }
+
+            if (principal <= 0) {
+                showError('முதலீட்டுத் தொகை பூஜ்ஜியத்தை விட அதிகமாக இருக்க வேண்டும்.');
+                return;
+            }
+
+            if (rate < 0) {
+                showError('வட்டி விகிதம் எதிர்மறையாக இருக்க முடியாது.');
+                return;
+            }
+
+            if (years === 0 && months === 0 && days === 0) {
+                showError('கால அளவு பூஜ்ஜியத்தை விட அதிகமாக இருக்க வேண்டும்.');
+                return;
+            }
+
+            // Calculation
+            let currentAmount = principal;
+            let totalInterest = 0;
+            let stepsHTML = '<h3>கணக்கீட்டு படிகள்:</h3>';
+
+            // Total months calculation
+            const totalMonths = years * 12 + months;
+            const completeThreeYearPeriods = Math.floor(totalMonths / 36);
+            const remainingMonths = totalMonths % 36;
+
+            // Process complete 3-year periods
+            for (let i = 0; i < completeThreeYearPeriods; i++) {
+                const interestFor3Years = (currentAmount * rate * 36) / 100;
+                const startAmount = currentAmount;
+                currentAmount += interestFor3Years;
+                totalInterest += interestFor3Years;
+
+                stepsHTML += `<div class="step">
+                    <span class="step-number">3 வருட கணக்கீடு ${i + 1}:</span>
+                    ${formatIndianCurrency(startAmount)} → வட்டி: ${formatIndianCurrency(interestFor3Years)} → ${formatIndianCurrency(currentAmount)}
+                </div>`;
+            }
+
+            // Process remaining months (less than 36)
+            if (remainingMonths > 0) {
+                const interestForRemainingMonths = (currentAmount * rate * remainingMonths) / 100;
+                const startAmount = currentAmount;
+                currentAmount += interestForRemainingMonths;
+                totalInterest += interestForRemainingMonths;
+
+                stepsHTML += `<div class="step">
+                    <span class="step-number">${remainingMonths} மாதங்கள்:</span>
+                    ${formatIndianCurrency(startAmount)} → வட்டி: ${formatIndianCurrency(interestForRemainingMonths)} → ${formatIndianCurrency(currentAmount)}
+                </div>`;
+            }
+
+            // Process days
+            if (days > 0) {
+                const dailyRate = rate / 30;
+                const interestForDays = (currentAmount * dailyRate * days) / 100;
+                const startAmount = currentAmount;
+                currentAmount += interestForDays;
+                totalInterest += interestForDays;
+
+                stepsHTML += `<div class="step">
+                    <span class="step-number">${days} நாட்கள்:</span>
+                    ${formatIndianCurrency(startAmount)} → வட்டி: ${formatIndianCurrency(interestForDays)} → ${formatIndianCurrency(currentAmount)}
+                </div>`;
+            }
+
+            // Display results
+            document.getElementById('resultPrincipal').textContent = formatIndianCurrency(principal);
+            document.getElementById('resultRate').textContent = rate + '%';
+            
+            let durationText = '';
+            if (years > 0) durationText += years + ' ஆண்டு' + (years > 1 ? 'கள்' : '') + ' ';
+            if (months > 0) durationText += months + ' மாதம்' + (months > 1 ? 'கள்' : '') + ' ';
+            if (days > 0) durationText += days + ' நாட்கள்';
+            if (!durationText) durationText = '0 நாட்கள்';
+            
+            document.getElementById('resultDuration').textContent = durationText.trim();
+            document.getElementById('resultTotalInterest').textContent = formatIndianCurrency(totalInterest);
+            document.getElementById('resultFinalAmount').textContent = formatIndianCurrency(currentAmount);
+            document.getElementById('stepsContainer').innerHTML = stepsHTML;
+
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.classList.add('show');
+
+            // Scroll to results
+            setTimeout(() => {
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        function resetForm() {
+            document.getElementById('principal').value = '';
+            document.getElementById('rate').value = '';
+            document.getElementById('years').value = '0';
+            document.getElementById('months').value = '0';
+            document.getElementById('days').value = '0';
+            document.getElementById('resultsSection').classList.remove('show');
+            hideError();
+            document.getElementById('principal').focus();
+        }
+
+        // Allow Enter key to calculate
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                calculateInterest();
+            }
+        });
+    </script>
+</body>
+</html>
