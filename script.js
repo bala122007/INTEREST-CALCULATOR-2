@@ -1,3 +1,22 @@
+function formatRupees(amount) {
+    return "₹" + amount.toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+
+function showError(message) {
+
+    const error = document.getElementById("error");
+
+    error.innerHTML = message;
+    error.style.display = "block";
+
+    document.getElementById("result").style.display = "none";
+}
+
+
 function calculate() {
 
     const principalInput =
@@ -6,82 +25,117 @@ function calculate() {
     const rateInput =
         document.getElementById("rate").value;
 
-    const years =
-        parseInt(document.getElementById("years").value) || 0;
+    const yearsInput =
+        document.getElementById("years").value;
 
-    const months =
-        parseInt(document.getElementById("months").value) || 0;
+    const monthsInput =
+        document.getElementById("months").value;
 
-    const days =
-        parseInt(document.getElementById("days").value) || 0;
+    const daysInput =
+        document.getElementById("days").value;
+
 
     const principal = parseFloat(principalInput);
     const monthlyRate = parseFloat(rateInput);
 
+    const years = parseInt(yearsInput) || 0;
+    const months = parseInt(monthsInput) || 0;
+    const days = parseInt(daysInput) || 0;
 
-    // Validation
 
-    if (!principalInput || isNaN(principal) || principal <= 0) {
-        showError("தயவுசெய்து சரியான முதலீட்டுத் தொகையை உள்ளிடவும்.");
+    // =========================
+    // VALIDATION
+    // =========================
+
+    if (
+        principalInput === "" ||
+        isNaN(principal) ||
+        principal <= 0
+    ) {
+        showError(
+            "தயவுசெய்து சரியான முதலீட்டுத் தொகையை உள்ளிடவும்."
+        );
         return;
     }
 
-    if (!rateInput || isNaN(monthlyRate) || monthlyRate < 0) {
-        showError("தயவுசெய்து சரியான மாத வட்டியை உள்ளிடவும்.");
+
+    if (
+        rateInput === "" ||
+        isNaN(monthlyRate) ||
+        monthlyRate < 0
+    ) {
+        showError(
+            "தயவுசெய்து சரியான மாத வட்டியை உள்ளிடவும்."
+        );
         return;
     }
+
+
+    if (years < 0) {
+        showError(
+            "ஆண்டுகள் 0-க்கு குறைவாக இருக்கக்கூடாது."
+        );
+        return;
+    }
+
 
     if (months < 0 || months > 11) {
-        showError("மாதங்கள் 0 முதல் 11 வரை இருக்க வேண்டும்.");
+        showError(
+            "மாதங்கள் 0 முதல் 11 வரை இருக்க வேண்டும்."
+        );
         return;
     }
+
 
     if (days < 0 || days > 30) {
-        showError("நாட்கள் 0 முதல் 30 வரை இருக்க வேண்டும்.");
+        showError(
+            "நாட்கள் 0 முதல் 30 வரை இருக்க வேண்டும்."
+        );
         return;
     }
 
 
+    if (years === 0 && months === 0 && days === 0) {
+        showError(
+            "கால அளவை உள்ளிடவும்."
+        );
+        return;
+    }
+
+
+    document.getElementById("error").style.display = "none";
+
+
+    // =========================
+    // INITIAL VALUES
+    // =========================
+
     let balance = principal;
+
     let totalInterest = 0;
 
     let resultHTML = "";
 
 
-    /*
-    ==========================================
-    3 ஆண்டு INTERVAL
-    ==========================================
+    // =========================
+    // COMPLETE 3 YEAR PERIODS
+    // =========================
 
-    Example:
+    let completePeriods =
+        Math.floor(years / 3);
 
-    5 years 5 months 15 days
-
-    First interval  = 3 years
-    Second interval = 2 years + 5 months + 15 days
-
-    IMPORTANT:
-
-    First 3-year interval complete aagura varaikkum
-    balance update aagathu.
-
-    3 years mudinjadhum mattum
-    interest + principal = new balance.
-    */
+    let remainingYears =
+        years % 3;
 
 
-    let remainingYears = years;
-
-
-    /*
-    ==========================================
-    ஒவ்வொரு COMPLETE 3 YEAR INTERVAL
-    ==========================================
-    */
-
-    while (remainingYears >= 3) {
+    for (
+        let period = 1;
+        period <= completePeriods;
+        period++
+    ) {
 
         let startingBalance = balance;
+
 
         // 3 years = 36 months
 
@@ -91,8 +145,6 @@ function calculate() {
             36 / 100;
 
 
-        // 3 years interest complete
-
         balance =
             startingBalance + interest;
 
@@ -101,10 +153,11 @@ function calculate() {
 
 
         resultHTML += `
+
             <div class="period">
 
                 <div class="period-title">
-                    3 ஆண்டுகள்
+                    ${period}வது 3 ஆண்டு காலம்
                 </div>
 
                 தொடக்கத் தொகை:
@@ -121,28 +174,14 @@ function calculate() {
                 <b>${formatRupees(balance)}</b>
 
             </div>
+
         `;
-
-
-        // 3 years completed
-
-        remainingYears -= 3;
     }
 
 
-    /*
-    ==========================================
-    REMAINING YEARS
-    ==========================================
-
-    Example:
-    5 years → 3 years completed
-              remaining = 2 years
-
-    இந்த 2 years-க்கு மட்டும்
-    அதே balance-ல் interest calculate ஆகும்.
-    */
-
+    // =========================
+    // REMAINING YEARS
+    // =========================
 
     if (remainingYears > 0) {
 
@@ -166,10 +205,11 @@ function calculate() {
 
 
         resultHTML += `
+
             <div class="period">
 
                 <div class="period-title">
-                    ${remainingYears} ஆண்டுகள்
+                    ${remainingYears} ஆண்டு
                 </div>
 
                 தொடக்கத் தொகை:
@@ -186,15 +226,14 @@ function calculate() {
                 <b>${formatRupees(balance)}</b>
 
             </div>
+
         `;
     }
 
 
-    /*
-    ==========================================
-    REMAINING MONTHS
-    ==========================================
-    */
+    // =========================
+    // REMAINING MONTHS
+    // =========================
 
     if (months > 0) {
 
@@ -215,6 +254,7 @@ function calculate() {
 
 
         resultHTML += `
+
             <div class="period">
 
                 <div class="period-title">
@@ -226,7 +266,12 @@ function calculate() {
 
                 <br>
 
-                வட்டி:
+                மாத வட்டி:
+                <b>${monthlyRate}%</b>
+
+                <br>
+
+                ${months} மாதங்களுக்கான வட்டி:
                 <b>${formatRupees(interest)}</b>
 
                 <br>
@@ -235,22 +280,21 @@ function calculate() {
                 <b>${formatRupees(balance)}</b>
 
             </div>
+
         `;
     }
 
 
-    /*
-    ==========================================
-    REMAINING DAYS
-    ==========================================
-
-    Monthly rate / 30
-    */
+    // =========================
+    // REMAINING DAYS
+    // =========================
 
     if (days > 0) {
 
         let startingBalance = balance;
 
+
+        // Monthly rate → Daily rate
 
         let dailyRate =
             monthlyRate / 30;
@@ -270,6 +314,7 @@ function calculate() {
 
 
         resultHTML += `
+
             <div class="period">
 
                 <div class="period-title">
@@ -281,12 +326,17 @@ function calculate() {
 
                 <br>
 
+                மாத வட்டி:
+                <b>${monthlyRate}%</b>
+
+                <br>
+
                 தினசரி வட்டி:
                 <b>${dailyRate.toFixed(4)}%</b>
 
                 <br>
 
-                வட்டி:
+                ${days} நாட்களுக்கான வட்டி:
                 <b>${formatRupees(interest)}</b>
 
                 <br>
@@ -295,15 +345,14 @@ function calculate() {
                 <b>${formatRupees(balance)}</b>
 
             </div>
+
         `;
     }
 
 
-    /*
-    ==========================================
-    FINAL RESULT
-    ==========================================
-    */
+    // =========================
+    // FINAL RESULT
+    // =========================
 
     resultHTML += `
 
@@ -314,9 +363,11 @@ function calculate() {
 
         </div>
 
+
         <div class="final-amount">
 
             இறுதித் தொகை
+
             <br><br>
 
             ${formatRupees(balance)}
@@ -331,7 +382,32 @@ function calculate() {
 
     document.getElementById("result").style.display =
         "block";
+}
+
+
+// =========================
+// RESET
+// =========================
+
+function resetCalculator() {
+
+    document.getElementById("principal").value = "";
+
+    document.getElementById("rate").value = "";
+
+    document.getElementById("years").value = "";
+
+    document.getElementById("months").value = "";
+
+    document.getElementById("days").value = "";
+
 
     document.getElementById("error").style.display =
         "none";
+
+    document.getElementById("result").style.display =
+        "none";
+
+    document.getElementById("result").innerHTML =
+        "";
 }
